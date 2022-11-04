@@ -35,12 +35,16 @@ const styles = StyleSheet.create({
       justifyContent: 'center'
     },
     row: {
-      flexDirection: 'row',
+      flexDirection: 'column',
       justifyContent: 'space-between'
     },
     name: {
       fontSize: 16,
       fontWeight: 'bold',
+      marginBottom: 3
+    },
+    status: {
+      fontSize: 13,
       marginBottom: 3
     },
     txt: {
