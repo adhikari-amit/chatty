@@ -1,5 +1,5 @@
 {
-  "AppSyncApiName": "chatty",
+  "AppSyncApiName": "chatter",
   "DynamoDBBillingMode": "PAY_PER_REQUEST",
   "DynamoDBEnableServerSideEncryption": false
 }

@@ -3,8 +3,8 @@
   "cognitoConfig": {
     "identityPoolName": "testAuthIdentityPool",
     "allowUnauthenticatedIdentities": false,
-    "resourceNameTruncated": "chatty89f6deb5",
-    "userPoolName": "chatty",
+    "resourceNameTruncated": "chatte0a32779d",
+    "userPoolName": "chatter",
     "autoVerifiedAttributes": [
       "email"
     ],
@@ -14,10 +14,10 @@
     ],
     "smsAuthenticationMessage": "Your authentication code is {####}",
     "smsVerificationMessage": "Your verification code is {####}",
-    "emailVerificationSubject": "Chatty Verification code: {####}",
+    "emailVerificationSubject": "Verification code: {####}",
     "emailVerificationMessage": "Verification code: {####}",
     "defaultPasswordPolicy": false,
-    "passwordPolicyMinLength": 8,
+    "passwordPolicyMinLength": 7,
     "passwordPolicyCharacters": [
       "Requires Lowercase",
       "Requires Numbers",
@@ -25,17 +25,17 @@
       "Requires Uppercase"
     ],
     "requiredAttributes": [
-      "email"
+      "phone_number"
     ],
     "aliasAttributes": [],
     "userpoolClientGenerateSecret": false,
     "userpoolClientRefreshTokenValidity": 30,
     "userpoolClientWriteAttributes": [],
     "userpoolClientReadAttributes": [],
-    "userpoolClientLambdaRole": "chatty89f6deb5_userpoolclient_lambda_role",
+    "userpoolClientLambdaRole": "chatte0a32779d_userpoolclient_lambda_role",
     "userpoolClientSetAttributes": false,
-    "sharedId": "89f6deb5",
-    "resourceName": "chatty",
+    "sharedId": "0a32779d",
+    "resourceName": "chatter",
     "authSelections": "identityPoolAndUserPool",
     "serviceName": "Cognito",
     "usernameAttributes": [
@@ -48,6 +48,41 @@
     "thirdPartyAuth": false,
     "authProviders": [],
     "usernameCaseSensitive": false,
-    "useEnabledMfas": true
+    "useEnabledMfas": true,
+    "authRoleArn": {
+      "Fn::GetAtt": [
+        "AuthRole",
+        "Arn"
+      ]
+    },
+    "unauthRoleArn": {
+      "Fn::GetAtt": [
+        "UnauthRole",
+        "Arn"
+      ]
+    },
+    "breakCircularDependency": true,
+    "dependsOn": [
+      {
+        "category": "function",
+        "resourceName": "chatterPostConfirmation",
+        "triggerProvider": "Cognito",
+        "attributes": [
+          "Arn",
+          "Name"
+        ]
+      }
+    ],
+    "triggers": {
+      "PostConfirmation": [
+        "custom"
+      ]
+    },
+    "hostedUI": false,
+    "parentStack": {
+      "Ref": "AWS::StackId"
+    },
+    "permissions": [],
+    "authTriggerConnections": "[\n  {\n    \"triggerType\": \"PostConfirmation\",\n    \"lambdaFunctionName\": \"chatterPostConfirmation\"\n  }\n]"
   }
-} 
+}

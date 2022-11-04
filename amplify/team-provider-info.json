@@ -1,26 +1,29 @@
 {
   "staging": {
     "awscloudformation": {
-      "AuthRoleName": "amplify-chatty-staging-63747-authRole",
-      "UnauthRoleArn": "arn:aws:iam::161973617149:role/amplify-chatty-staging-63747-unauthRole",
-      "AuthRoleArn": "arn:aws:iam::161973617149:role/amplify-chatty-staging-63747-authRole",
+      "AuthRoleName": "amplify-chatter-staging-203052-authRole",
+      "UnauthRoleArn": "arn:aws:iam::161973617149:role/amplify-chatter-staging-203052-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::161973617149:role/amplify-chatter-staging-203052-authRole",
       "Region": "ap-south-1",
-      "DeploymentBucketName": "amplify-chatty-staging-63747-deployment",
-      "UnauthRoleName": "amplify-chatty-staging-63747-unauthRole",
-      "StackName": "amplify-chatty-staging-63747",
-      "StackId": "arn:aws:cloudformation:ap-south-1:161973617149:stack/amplify-chatty-staging-63747/0f5ec400-43af-11ed-b991-021a9e2041ce",
-      "AmplifyAppId": "d3csqk6x3rh6q6",
-      "AuthTriggerTemplateURL": "https://s3.amazonaws.com/amplify-chatty-staging-63747-deployment/amplify-cfn-templates/auth/auth-trigger-cloudformation-template.json"
+      "DeploymentBucketName": "amplify-chatter-staging-203052-deployment",
+      "UnauthRoleName": "amplify-chatter-staging-203052-unauthRole",
+      "StackName": "amplify-chatter-staging-203052",
+      "StackId": "arn:aws:cloudformation:ap-south-1:161973617149:stack/amplify-chatter-staging-203052/699dfb10-5bb6-11ed-80f2-02781abcf062",
+      "AmplifyAppId": "d2kkbea4xw2nj8",
+      "AuthTriggerTemplateURL": "https://s3.amazonaws.com/amplify-chatter-staging-203052-deployment/amplify-cfn-templates/auth/auth-trigger-cloudformation-template.json"
     },
     "categories": {
       "auth": {
-        "chatty": {}
+        "chatter": {}
       },
       "function": {
-        "chattyPostConfirmation": {
-          "deploymentBucketName": "amplify-chatty-staging-63747-deployment",
-          "s3Key": "amplify-builds/chattyPostConfirmation-5650446541374f383479-build.zip"
+        "chatterPostConfirmation": {
+          "deploymentBucketName": "amplify-chatter-staging-203052-deployment",
+          "s3Key": "amplify-builds/chatterPostConfirmation-365368396f7955612b5a-build.zip"
         }
+      },
+      "api": {
+        "chatter": {}
       }
     }
   }

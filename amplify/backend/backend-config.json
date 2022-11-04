@@ -1,9 +1,19 @@
 {
   "auth": {
-    "chatty": {
+    "chatter": {
       "service": "Cognito",
       "providerPlugin": "awscloudformation",
-      "dependsOn": [],
+      "dependsOn": [
+        {
+          "category": "function",
+          "resourceName": "chatterPostConfirmation",
+          "triggerProvider": "Cognito",
+          "attributes": [
+            "Arn",
+            "Name"
+          ]
+        }
+      ],
       "customAuth": false,
       "frontendAuthConfig": {
         "socialProviders": [],
@@ -11,10 +21,10 @@
           "EMAIL"
         ],
         "signupAttributes": [
-          "EMAIL"
+          "PHONE_NUMBER"
         ],
         "passwordProtectionSettings": {
-          "passwordPolicyMinLength": 8,
+          "passwordPolicyMinLength": 7,
           "passwordPolicyCharacters": [
             "REQUIRES_LOWERCASE",
             "REQUIRES_NUMBERS",
@@ -33,7 +43,7 @@
     }
   },
   "api": {
-    "chatty": {
+    "chatter": {
       "service": "AppSync",
       "providerPlugin": "awscloudformation",
       "dependsOn": [],
@@ -56,7 +66,7 @@
     }
   },
   "function": {
-    "chattyPostConfirmation": {
+    "chatterPostConfirmation": {
       "build": true,
       "providerPlugin": "awscloudformation",
       "service": "Lambda"
