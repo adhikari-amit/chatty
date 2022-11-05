@@ -6,7 +6,7 @@ const styles = StyleSheet.create({
       flexDirection: 'row',
       padding: 10,
     },
-    Image: {
+    image: {
       width: 50,
       height: 50,
       borderRadius: 25,
@@ -30,7 +30,7 @@ const styles = StyleSheet.create({
       color: 'white',
       fontSize: 12
     },
-    rightcontainer: {
+    rightContainer: {
       flex: 1,
       justifyContent: 'center'
     },
@@ -43,7 +43,7 @@ const styles = StyleSheet.create({
       fontWeight: 'bold',
       marginBottom: 3
     },
-    txt: {
+    text: {
       color: 'grey'
     }
   });

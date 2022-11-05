@@ -1,49 +1,49 @@
-import { View, Text, Image, Pressable } from 'react-native'
-import React from 'react'
-import styles from './style'
-import { useNavigation } from '@react-navigation/native'
-import { Auth, DataStore } from 'aws-amplify'
-import { ChatRoom, ChatRoomUser, User } from '../../src/models'
+import React from 'react';
+import { Text, Image, View, Pressable } from 'react-native';
+import { useNavigation } from '@react-navigation/core';
+import styles from './style';
+import { Auth, DataStore } from 'aws-amplify';
+import { ChatRoom, User, ChatRoomUser } from '../../src/models';
 
+export default function UserItem({user}:any) {
+  const navigation = useNavigation();
 
-const UserItem = ({ user }: any) => {
+  const onPress = async () => {
 
-    const navigation = useNavigation();
-    const onPress = async() => {
-    //  Create a ChatRoom
-     const newChatRoom=await DataStore.save(new ChatRoom({newMessages:0}))
+    // TODO if there is already a chat room between these 2 users
+    // then redirect to the existing chat room
+    // otherwise, create a new chatroom with these users.
 
-    //  Connect Authenticated User to new chatroom
-    const authUser=await Auth.currentAuthenticatedUser()
-    const dbUser=await DataStore.query(User,authUser.attributes.sub)
+    // Create a chat room
+    const newChatRoom = await DataStore.save(new ChatRoom({newMessages: 0}));
+    
+    // connect authenticated user with the chat room
+    const authUser = await Auth.currentAuthenticatedUser();
+    const dbUser = await DataStore.query(User, authUser.attributes.sub);
     await DataStore.save(new ChatRoomUser({
-        user:dbUser,
-        chatRoom:newChatRoom
+      user: dbUser,
+      chatroom: newChatRoom
     }))
 
-    // Connect Clicked user to the chatroom
-     await DataStore.save(new ChatRoomUser({
-         user:user,
-         chatRoom:newChatRoom
-     }))
+    // connect clicked user with the chat room
+    await DataStore.save(new ChatRoomUser({
+      user,
+      chatroom: newChatRoom
+    }));
 
-     navigation.navigate('ChatRoom',{id:newChatRoom.id})
+    navigation.navigate('ChatRoom', { id: newChatRoom.id });
+  }
 
-    }
-    return (
-       <>
-        <Pressable onPress={onPress} style={styles.container}>
-            <Image source={{ uri: user.imageUri }} style={styles.Image} />
-            <View style={styles.rightcontainer}>
-                <View style={styles.row}>
-                    <Text style={styles.name}>{user.name}</Text>
-                    <Text style={styles.status}>{user.status}</Text>
-                </View>
-            </View>
-        </Pressable>
-        </>
-    )
+  return (
+    <Pressable onPress={onPress} style={styles.container}>
+      <Image source={{ uri: user.imageUri}} style={styles.image} />
+
+      <View style={styles.rightContainer}>
+        <View style={styles.row}>
+          <Text style={styles.name}>{user.name}</Text>
+          <Text numberOfLines={1} style={styles.status}>{user.status}</Text>
+        </View>
+      </View>
+    </Pressable>
+  );
 }
-
-
-export default UserItem

@@ -72,7 +72,7 @@ export declare const Message: (new (init: ModelInit<Message, MessageMetaData>) =
 
 type EagerUser = {
   readonly id: string;
-  readonly name?: string | null;
+  readonly name: string;
   readonly imageUri?: string | null;
   readonly status?: string | null;
   readonly Messages?: (Message | null)[] | null;
@@ -83,7 +83,7 @@ type EagerUser = {
 
 type LazyUser = {
   readonly id: string;
-  readonly name?: string | null;
+  readonly name: string;
   readonly imageUri?: string | null;
   readonly status?: string | null;
   readonly Messages: AsyncCollection<Message>;
