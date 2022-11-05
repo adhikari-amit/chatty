@@ -22,9 +22,6 @@ export default function HomeScreen() {
     fetchChatRooms();
   }, []);
 
- console.warn(chatRooms);
- 
-
   const logOut = () => {
     Auth.signOut();
   }
