@@ -32,7 +32,7 @@ const ChatRoomScreen = () => {
     
         fetchChatRoom()
     }, [])
-
+  
     useEffect(() => {
         const fetchMessages = async () => {
             if (!chatRoom) {
@@ -59,8 +59,6 @@ const ChatRoomScreen = () => {
 
 
 
-    navigation.setOptions({ title: 'Elon Musk' })
-    // console.warn(route.params?.id)
 
     if (!chatRoom) {
         return <ActivityIndicator />
