@@ -36,7 +36,6 @@ const ChatRoomScreen = () => {
     useEffect(() => {
         const fetchMessages = async () => {
             if (!chatRoom) {
-                console.log("No ChatRoom exist");
                 return
             }
             const fetchedmessage = await DataStore.query(Message, message => message.chatroomID("eq", chatRoom?.id), { sort: message => message.createdAt(SortDirection.DESCENDING) })
