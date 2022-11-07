@@ -5,7 +5,7 @@ import styles from './style';
 import { Auth, DataStore } from 'aws-amplify';
 import { ChatRoom, User, ChatRoomUser } from '../../src/models';
 
-export default function UserItem({user}:any) {
+export default function UserItem({ user }:any) {
   const navigation = useNavigation();
 
   const onPress = async () => {
@@ -27,9 +27,9 @@ export default function UserItem({user}:any) {
 
     // connect clicked user with the chat room
     await DataStore.save(new ChatRoomUser({
-      user,
+      user: user,
       chatroom: newChatRoom
-    }));
+    }))
 
     navigation.navigate('ChatRoom', { id: newChatRoom.id });
   }
@@ -41,7 +41,6 @@ export default function UserItem({user}:any) {
       <View style={styles.rightContainer}>
         <View style={styles.row}>
           <Text style={styles.name}>{user.name}</Text>
-          <Text numberOfLines={1} style={styles.status}>{user.status}</Text>
         </View>
       </View>
     </Pressable>

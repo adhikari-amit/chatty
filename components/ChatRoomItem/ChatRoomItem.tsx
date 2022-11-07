@@ -7,9 +7,11 @@ import styles from './style';
 import {Auth} from '@aws-amplify/auth';
 
 export default function ChatRoomItem({ chatRoom }:any) {
-  // const [users, setUsers] = useState<User[]>([]); // all users in this chatroom
-  const [user, setUser] = useState<User|null>(null); // the display user
-  //const [lastMessage, setLastMessage] = useState<Message|undefined>();
+
+  // all users in this chatroom
+  // const [users, setUsers] = useState<User[]>([]); 
+  const [user, setUser] = useState<User|null>(null); 
+  const [lastMessage, setLastMessage] = useState<Message|undefined>();
 
   const navigation = useNavigation();
   
@@ -17,21 +19,18 @@ export default function ChatRoomItem({ chatRoom }:any) {
     const fetchUsers = async () => {
       const fetchedUsers = (await DataStore.query(ChatRoomUser))
         .filter(chatRoomUser => chatRoomUser.chatRoom.id === chatRoom.id)
-        .map(chatRoomUser => chatRoomUser.user);
-
-
+        .map(chatRoomUser => chatRoomUser.user)
       const authUser = await Auth.currentAuthenticatedUser();
-      setUser(fetchedUsers.find(user => user.id !== authUser.attributes.sub) || null);
-
+      setUser(fetchedUsers.find(user => user.id !== authUser.attributes.sub) || null)
     };
     fetchUsers();
   }, []);
 
-/*  useEffect(() => {
+  useEffect(() => {
     if (!chatRoom.chatRoomLastMessageId) { return }
     DataStore.query(Message, chatRoom.chatRoomLastMessageId).then(setLastMessage);
   }, [])
-*/
+
   const onPress = () => {
     navigation.navigate('ChatRoom', { id: chatRoom.id });
   }
@@ -51,9 +50,9 @@ export default function ChatRoomItem({ chatRoom }:any) {
       <View style={styles.rightContainer}>
         <View style={styles.row}>
           <Text style={styles.name}>{user.name}</Text>
-         
+          <Text style={styles.text}>{lastMessage?.createdAt}</Text>
         </View>
-    
+        <Text numberOfLines={1} style={styles.text}>{lastMessage?.content}</Text>
       </View>
     </Pressable>
   );
