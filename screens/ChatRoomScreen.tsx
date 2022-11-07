@@ -37,6 +37,18 @@ const ChatRoomScreen = () => {
 
     }
     
+     useEffect(()=>{
+           
+        const subscription = DataStore.observe(Message).subscribe(msg => {
+
+            if (msg.model === Message && msg.opType === "INSERT") {
+                setMessage(existingMessage => [msg.element, ...existingMessage])
+            }
+        })
+        return () => subscription.unsubscribe()
+     },[])
+
+    
     const fetchMessages=async()=>{
         if(!chatRoom){
             console.error("No ChatRoom exist");
