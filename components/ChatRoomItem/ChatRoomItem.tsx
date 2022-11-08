@@ -20,7 +20,7 @@ export default function ChatRoomItem({ chatRoom }:any) {
       const fetchedUsers = (await DataStore.query(ChatRoomUser))
         .filter(chatRoomUser => chatRoomUser.chatRoom.id === chatRoom.id)
         .map(chatRoomUser => chatRoomUser.user)
-      const authUser = await Auth.currentAuthenticatedUser();
+      const authUser = await Auth.currentAuthenticatedUser()
       setUser(fetchedUsers.find(user => user.id !== authUser.attributes.sub) || null)
     };
     fetchUsers();

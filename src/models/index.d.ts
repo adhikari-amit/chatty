@@ -48,18 +48,22 @@ export declare const ChatRoom: (new (init: ModelInit<ChatRoom, ChatRoomMetaData>
 
 type EagerMessage = {
   readonly id: string;
-  readonly content: string;
+  readonly content?: string | null;
   readonly userID: string;
   readonly chatroomID: string;
+  readonly image?: string | null;
+  readonly audio?: string | null;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
 }
 
 type LazyMessage = {
   readonly id: string;
-  readonly content: string;
+  readonly content?: string | null;
   readonly userID: string;
   readonly chatroomID: string;
+  readonly image?: string | null;
+  readonly audio?: string | null;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
 }

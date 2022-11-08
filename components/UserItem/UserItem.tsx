@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Text, Image, View, Pressable } from 'react-native';
 import { useNavigation } from '@react-navigation/core';
 import styles from './style';
@@ -6,14 +6,28 @@ import { Auth, DataStore } from 'aws-amplify';
 import { ChatRoom, User, ChatRoomUser } from '../../src/models';
 
 export default function UserItem({ user }:any) {
-  const navigation = useNavigation();
+  const navigation = useNavigation()
+
+  //  TODO 
+  //  const [chatroom, setChatroom] = useState()
+  //  useEffect(()=>{
+  //    const getchatroom=async()=>{
+  //     // const fetchedchatroom = (await DataStore.query(ChatRoomUser)).filter(chatRoomUser => chatRoomUser.user.id === user.id)
+  //     //   // setChatroom(fetchedchatroom)
+  //       const authUser = await Auth.currentAuthenticatedUser()
+  //       const userinchatroom=(await DataStore.query(ChatRoomUser)).filter(chatRoomUser => chatRoomUser.user.id === authUser.attributes.sub)
+        
+  //       const fetchedchatroom = (await DataStore.query(ChatRoomUser, (chatroom) =>chatroom.id('contains', userinchatroom),)).filter(chatRoomUser => chatRoomUser.user.id === user.id)
+  //    }
+  //    getchatroom()
+  //  },[])
+
 
   const onPress = async () => {
 
     // TODO if there is already a chat room between these 2 users
     // then redirect to the existing chat room
     // otherwise, create a new chatroom with these users.
-
     // Create a chat room
     const newChatRoom = await DataStore.save(new ChatRoom({newMessages: 0}));
     

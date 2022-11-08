@@ -33,6 +33,15 @@ const styles = StyleSheet.create({
         borderRadius: 25,
         justifyContent: 'center',
         alignItems: 'center'
+    },
+    sendImageContainer:{
+        flexDirection:'row',
+        marginVertical:10,
+        alignSelf:"stretch",
+        justifyContent:"space-between",
+        borderWidth:1,
+        borderColor:"lightgray",
+        borderRadius:10
     }
 })
 
