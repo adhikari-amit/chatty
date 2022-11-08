@@ -17,6 +17,7 @@ import * as ImagePicker from 'expo-image-picker'
 import 'react-native-get-random-values'
 import { v4 as uuidv4 } from 'uuid'
 import { Audio, AVPlaybackStatus } from 'expo-av'
+import AudioPlayer from '../AudioPlayer'
 
 
 const MessageInput = ({ chatroom }: any) => {
@@ -24,13 +25,9 @@ const MessageInput = ({ chatroom }: any) => {
     const [isEmojiPickerOpen, setIsEmojiPickerOpen] = useState(false)
     const [image, setImage] = useState<string | null>(null)
     const [recording, setRecording] = useState<Audio.Recording | null>(null)
-    const [sound, setSound] = useState<Audio.Sound | null>(null)
     const [soundURI, setSoundURI] = useState<string | null>(null)
     const [progress, setProgress] = useState(0)
-    const [pause, setPause] = useState(true)
-    const [audioProgress,setAudioProgress]=useState(0)
-    const [audioDuration,setAudioDuration]=useState(0)
-
+   
     //  Reset StateValue of all once data send.
     const resetFields = () => {
         setMessage('')
@@ -38,7 +35,7 @@ const MessageInput = ({ chatroom }: any) => {
         setImage(null)
         setProgress(0)
         setSoundURI( null)
-        setSound(null)
+      
     }
 
     // Permission ask fro audio,camera,image
@@ -167,15 +164,7 @@ const MessageInput = ({ chatroom }: any) => {
 
     }
     
-    const onPlaybackStatusUpdate=(status:AVPlaybackStatus)=>{
-       if(!status.isLoaded){
-            return
-       }
 
-       setAudioProgress(status.positionMillis/(status.durationMillis || 1))
-       setPause(!status.isPlaying)
-       setAudioDuration(status.durationMillis || 0)
-    }
     const startRecording = async () => {
         try {
             await Audio.requestPermissionsAsync()
@@ -207,27 +196,9 @@ const MessageInput = ({ chatroom }: any) => {
             return
         }
         setSoundURI(uri)
-        const { sound } = await Audio.Sound.createAsync({ uri },{}, onPlaybackStatusUpdate)
-        setSound(sound)
 
     }
-    const playPauseSound = async () => {
-        if (!sound) {
-            return
-        }
-        if (pause) {
-            await sound.playFromPositionAsync(0)
-        }
-        else {
-            await sound.playAsync()
-        }
-    }
-    
-    const getDuration=()=>{
-        const minutes=Math.floor(audioDuration / (60*1000))
-        const seconds=Math.floor((audioDuration % (60*1000)) /1000)
-        return `${minutes}:${seconds<10 ? "0":""}${seconds.toPrecision()}`
-    }
+
 
     const sendAudio = async () => {
         if (!soundURI) {
@@ -275,18 +246,7 @@ const MessageInput = ({ chatroom }: any) => {
             </View>)
             }
 
-            {sound && (
-                <View style={styles.sendAudioContainer}>
-                    <Pressable onPress={playPauseSound}>
-                        <Feather name={pause?'play':'pause'} size={24} color="black" />
-                    </Pressable>
-                    <View style={styles.audioProgressBG}>
-                        <View style={[styles.audioProgressFG,{left:`${audioProgress*100}%`}]} />
-                    </View>
-                    <Text>{getDuration()}</Text>
-                </View>
-            )
-
+            {soundURI && <AudioPlayer soundURI={soundURI}/>
             }
 
             <View style={styles.row}>
