@@ -10,7 +10,9 @@ const styles = StyleSheet.create({
     maxWidth: "75%",
     // display:"flex",
   },
-
+  row:{
+     flexDirection:"row"
+  },
   // messageReply: {
   //   backgroundColor: "gray",
   //   padding: 5,

@@ -114,21 +114,23 @@ const Messages = (props: any) => {
         </View>
       )}
       {soundURI && <AudioPlayer soundURI={soundURI} />}
-      {!!message.content && (
-        <Text style={{ color: isMe ? "black" : "white" }}>
-          {message.content}
-        </Text>
-      )}
-      {isMe && !!message.status && message.status !== "SENT" && (
-        <Ionicons
-          name={
-            message.status === "DELIVERED" ? "checkmark" : "checkmark-done"
-          }
-          size={16}
-          color="gray"
-          style={{ marginHorizontal: 5 }}
-        />
-      )}
+      <View style={styles.row}>
+        {!!message.content && (
+          <Text style={{ color: isMe ? "black" : "white" }}>
+            {message.content}
+          </Text>
+        )}
+        {isMe && !!message.status && message.status !== "SENT" && (
+          <Ionicons
+            name={
+              message.status === "DELIVERED" ? "checkmark" : "checkmark-done"
+            }
+            size={16}
+            color="gray"
+            style={{ marginHorizontal: 5 }}
+          />
+        )}
+      </View>
     </Pressable>
   );
 };
