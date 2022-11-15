@@ -11,13 +11,13 @@ export default function HomeScreen() {
 
   useEffect(() => {
     const fetchChatRooms = async () => {
-      const userData = await Auth.currentAuthenticatedUser();
-
+      const userData = await Auth.currentAuthenticatedUser()
       const chatRooms = (await DataStore.query(ChatRoomUser))
         .filter(chatRoomUser => chatRoomUser.user.id === userData.attributes.sub)
         .map(chatRoomUser => chatRoomUser.chatRoom);
 
       setChatRooms(chatRooms);
+      
     };
     fetchChatRooms();
   }, []);
@@ -25,7 +25,9 @@ export default function HomeScreen() {
   const logOut = () => {
     Auth.signOut();
   }
-
+  
+  
+  
   return (
     <View style={styles.page}>
        <FlatList 

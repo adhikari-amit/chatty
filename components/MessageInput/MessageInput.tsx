@@ -57,7 +57,7 @@ const MessageInput = ({ chatroom }: any) => {
     }, [])
 
     // Send the content on press button click.  
-    const sendContent = () => {
+    const sendContent =async () => {
         if (image) {
             sendImage()
         }
@@ -70,6 +70,10 @@ const MessageInput = ({ chatroom }: any) => {
         else {
             onePlusCLicked()
         }
+        
+        const authUser=await Auth.currentAuthenticatedUser()
+        console.warn((authUser))
+        
     }
 
     // Update the Last Message.
