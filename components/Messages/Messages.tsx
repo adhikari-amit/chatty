@@ -1,28 +1,74 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ActivityIndicator, useWindowDimensions } from 'react-native';
-import { DataStore } from '@aws-amplify/datastore';
-import { User } from '../../src/models';
-import { Auth , Storage} from 'aws-amplify';
-import styles from './style';
-import { S3Image } from 'aws-amplify-react-native'
-import AudioPlayer from '../AudioPlayer';
+import React, { useState, useEffect } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  ActivityIndicator,
+  Pressable,
+} from "react-native";
+import { DataStore } from "@aws-amplify/datastore";
+import { User } from "../../src/models";
+import { Auth, Storage } from "aws-amplify";
+import { S3Image } from "aws-amplify-react-native";
+import { useWindowDimensions } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import AudioPlayer from "../AudioPlayer";
+import { Message as MessageModel } from "../../src/models";
+import styles from "./style";
 
-const Messages = ({ message }: any) => {
+
+
+
+const Messages = (props: any) => {
+  const { setAsMessageReply, message: propMessage } = props;
+
+  const [message, setMessage] = useState<MessageModel>(propMessage);
+  const [repliedTo, setRepliedTo] = useState<MessageModel | undefined>(
+    undefined
+  );
   const [user, setUser] = useState<User | undefined>();
-  const [isMe, setIsMe] = useState<boolean>(false);
-  const [soundURI,setSoundURI]=useState<any>(null)
-  const { width } = useWindowDimensions()
+  const [isMe, setIsMe] = useState<boolean | null>(null);
+  const [soundURI, setSoundURI] = useState<any>(null);
+
+  const { width } = useWindowDimensions();
 
   useEffect(() => {
     DataStore.query(User, message.userID).then(setUser);
-  }, [])
+  }, []);
 
+  useEffect(() => {
+    setMessage(propMessage);
+  }, [propMessage]);
 
-  useEffect(()=>{
-    if(message.audio){
-       Storage.get(message.audio).then(setSoundURI)
+  useEffect(() => {
+    if (message?.replyToMessageID) {
+      DataStore.query(MessageModel, message.replyToMessageID).then(
+        setRepliedTo
+      );
     }
-  },[message])
+  }, [message]);
+
+  useEffect(() => {
+    const subscription = DataStore.observe(MessageModel, message.id).subscribe(
+      (msg) => {
+        if (msg.model === MessageModel && msg.opType === "UPDATE") {
+          setMessage((message) => ({ ...message, ...msg.element }));
+        }
+      }
+    );
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  useEffect(() => {
+    setAsRead();
+  }, [isMe, message]);
+
+  useEffect(() => {
+    if (message.audio) {
+      Storage.get(message.audio).then(setSoundURI);
+    }
+  }, [message]);
 
   useEffect(() => {
     const checkIfMe = async () => {
@@ -31,33 +77,62 @@ const Messages = ({ message }: any) => {
       }
       const authUser = await Auth.currentAuthenticatedUser();
       setIsMe(user.id === authUser.attributes.sub);
+    };
+    checkIfMe();
+  }, [user]);
+
+  const setAsRead = async () => {
+    if (isMe === false && message.status !== "READ") {
+      await DataStore.save(
+        MessageModel.copyOf(message, (updated) => {
+          updated.status = "READ";
+        })
+      );
     }
-    checkIfMe()
-  }, [user])
+  };
 
   if (!user) {
-    return <ActivityIndicator />
+    return <ActivityIndicator />;
   }
-   
-  
-  return (
-    <View style={[styles.container, isMe ? styles.rightContainer : styles.leftContainer,{width: soundURI? "75%": 'auto'}]}>
-     
-        {message.image && (
-            <View style={{marginBottom: message.content?10:0}}>
-            <S3Image imgKey={message.image} style={{ width: width * 0.7, aspectRatio: 4 / 3 }} resizeMode="contain" />
-            </View>
-          )
-        }
-        
-        {message.audio &&(
-          < AudioPlayer soundURI={soundURI} />
-        )
-        }
 
-       {message.content && (<Text style={{ color: isMe ? 'black' : 'white' }}>{message.content}</Text>)}
-    </View>
-  )
-}
+  return (
+    <Pressable
+      onLongPress={setAsMessageReply}
+      style={[
+        styles.container,
+        isMe ? styles.rightContainer : styles.leftContainer,
+        { width: soundURI ? "75%" : "auto" },
+      ]}
+    >
+      {message.image && (
+        <View style={{ marginBottom: message.content ? 10 : 0 }}>
+          <S3Image
+            imgKey={message.image}
+            style={{ width: width * 0.65, aspectRatio: 4 / 3 }}
+            resizeMode="contain"
+          />
+        </View>
+      )}
+      {soundURI && <AudioPlayer soundURI={soundURI} />}
+      {!!message.content && (
+        <Text style={{ color: isMe ? "black" : "white" }}>
+          {message.content}
+        </Text>
+      )}
+      {isMe && !!message.status && message.status !== "SENT" && (
+        <Ionicons
+          name={
+            message.status === "DELIVERED" ? "checkmark" : "checkmark-done"
+          }
+          size={16}
+          color="gray"
+          style={{ marginHorizontal: 5 }}
+        />
+      )}
+    </Pressable>
+  );
+};
+
+
 
 export default Messages;

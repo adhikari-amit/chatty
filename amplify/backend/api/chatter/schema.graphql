@@ -1,3 +1,9 @@
+enum MessageStatus {
+  SENT
+  DELIVERED
+  READ
+}
+
 type ChatRoom @model @auth(rules: [{allow: public}]) {
   id: ID!
   newMessages: Int
@@ -13,6 +19,7 @@ type User @model @auth(rules: [{allow: public}]) {
   status: String
   Messages: [Message] @hasMany(indexName: "byUser", fields: ["id"])
   chatrooms: [ChatRoom] @manyToMany(relationName: "ChatRoomUser")
+  lastOnlineAt: AWSTimestamp
 }
 
 type Message @model @auth(rules: [{allow: public}]) {
@@ -22,5 +29,7 @@ type Message @model @auth(rules: [{allow: public}]) {
   chatroomID: ID! @index(name: "byChatRoom")
   image: String
   audio: String
+  status: MessageStatus
+  replyToMessageID: ID
 }
  

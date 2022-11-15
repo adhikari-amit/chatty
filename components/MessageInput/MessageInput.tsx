@@ -72,7 +72,6 @@ const MessageInput = ({ chatroom }: any) => {
         }
         
         const authUser=await Auth.currentAuthenticatedUser()
-        console.warn((authUser))
         
     }
 
@@ -97,6 +96,7 @@ const MessageInput = ({ chatroom }: any) => {
                 content: message,
                 userID: user.attributes.sub,
                 chatroomID: chatroom.id,
+                status:"SENT"
             }))
             UpdateLastMessage(newMessage)
             resetFields()
@@ -159,8 +159,6 @@ const MessageInput = ({ chatroom }: any) => {
             aspect: [1, 1],
             quality: 1,
         })
-
-        console.log(result);
 
         if (!result.cancelled) {
             setImage(result.uri);
@@ -229,7 +227,7 @@ const MessageInput = ({ chatroom }: any) => {
     return (
 
         <KeyboardAvoidingView style={[styles.root, { height: isEmojiPickerOpen ? "50%" : "auto" }]} behavior={Platform.OS === 'ios' ? 'padding' : "height"}
-            keyboardVerticalOffset={50}
+            keyboardVerticalOffset={80}
         >
             {image && (<View style={styles.sendImageContainer}>
                 <Image source={{ uri: image }} style={{ width: 100, height: 100, borderRadius: 10 }} />

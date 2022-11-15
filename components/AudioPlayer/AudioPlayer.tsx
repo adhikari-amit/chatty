@@ -1,39 +1,39 @@
-import { View, Text,Pressable } from 'react-native'
+import { View, Text, Pressable } from 'react-native'
 import { SimpleLineIcons, Feather, AntDesign, Ionicons } from '@expo/vector-icons'
 import React, { useEffect, useState } from 'react'
 import { Audio, AVPlaybackStatus } from 'expo-av'
 import styles from './style'
 
-const AudioPlayer = ({soundURI}:any) => {
+const AudioPlayer = ({ soundURI }: any) => {
     const [pause, setPause] = useState(true)
-    const [audioProgress,setAudioProgress]=useState(0)
-    const [audioDuration,setAudioDuration]=useState(0)
+    const [audioProgress, setAudioProgress] = useState(0)
+    const [audioDuration, setAudioDuration] = useState(0)
     const [sound, setSound] = useState<Audio.Sound | null>(null)
-    
-    useEffect(()=>{
-       const loadSound=async()=>{
-        if(!soundURI) {return}
-           const { sound } = await Audio.Sound.createAsync({ uri:soundURI },{}, onPlaybackStatusUpdate)
-           setSound(sound)
-       }
-       loadSound();
 
-       ()=>{
-        if(sound){
-            sound.unloadAsync()
+    useEffect(() => {
+        const loadSound = async () => {
+            if (!soundURI) { return }
+            const { sound } = await Audio.Sound.createAsync({ uri: soundURI }, {}, onPlaybackStatusUpdate)
+            setSound(sound)
         }
-       }
+        loadSound();
 
-    },[soundURI])
-    const onPlaybackStatusUpdate=(status:AVPlaybackStatus)=>{
-        if(!status.isLoaded){
-             return
+        () => {
+            if (sound) {
+                sound.unloadAsync()
+            }
         }
- 
-        setAudioProgress(status.positionMillis/(status.durationMillis || 1))
+
+    }, [soundURI])
+    const onPlaybackStatusUpdate = (status: AVPlaybackStatus) => {
+        if (!status.isLoaded) {
+            return
+        }
+
+        setAudioProgress(status.positionMillis / (status.durationMillis || 1))
         setPause(!status.isPlaying)
         setAudioDuration(status.durationMillis || 0)
-     }
+    }
 
 
     const playPauseSound = async () => {
@@ -47,24 +47,24 @@ const AudioPlayer = ({soundURI}:any) => {
             await sound.playAsync()
         }
     }
-    
-    const getDuration=()=>{
-        const minutes=Math.floor(audioDuration / (60*1000))
-        const seconds=Math.floor((audioDuration % (60*1000)) /1000)
-        return `${minutes}:${seconds<10 ? "0":""}${seconds.toPrecision()}`
+
+    const getDuration = () => {
+        const minutes = Math.floor(audioDuration / (60 * 1000))
+        const seconds = Math.floor((audioDuration % (60 * 1000)) / 1000)
+        return `${minutes}:${seconds < 10 ? "0" : ""}${seconds.toPrecision()}`
     }
 
-  return (
-    <View style={styles.sendAudioContainer}>
-                    <Pressable onPress={playPauseSound}>
-                        <Feather name={pause?'play':'pause'} size={24} color="black" />
-                    </Pressable>
-                    <View style={styles.audioProgressBG}>
-                        <View style={[styles.audioProgressFG,{left:`${audioProgress*100}%`}]} />
-                    </View>
-                    <Text>{getDuration()}</Text>
-                </View>
-  )
+    return (
+        <View style={styles.sendAudioContainer}>
+            <Pressable onPress={playPauseSound}>
+                <Feather name={pause ? 'play' : 'pause'} size={24} color="black" />
+            </Pressable>
+            <View style={styles.audioProgressBG}>
+                <View style={[styles.audioProgressFG, { left: `${audioProgress * 100}%` }]} />
+            </View>
+            <Text>{getDuration()}</Text>
+        </View>
+    )
 }
 
 export default AudioPlayer

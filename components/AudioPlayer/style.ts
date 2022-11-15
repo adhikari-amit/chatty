@@ -11,7 +11,7 @@ const styles = StyleSheet.create({
         flexDirection:"row",
         alignItems:'center',
         alignSelf:'stretch',
-        backgroundColor:'white' 
+        backgroundColor:'white'
     },
     audioProgressBG:{
         height:3,
