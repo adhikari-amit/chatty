@@ -15,13 +15,12 @@ import { Ionicons } from "@expo/vector-icons";
 import AudioPlayer from "../AudioPlayer";
 import { Message as MessageModel } from "../../src/models";
 import styles from "./style";
-import MessageReply from "../MessageReply";
 
 
 
 
-const Messages = (props: any) => {
-  const { setAsMessageReply, message: propMessage } = props
+const MessageReply = (props: any) => {
+  const { message: propMessage } = props
 
   const [message, setMessage] = useState<MessageModel>(propMessage)
   const [repliedTo, setRepliedTo] = useState<MessageModel | undefined>(undefined  )
@@ -39,27 +38,6 @@ const Messages = (props: any) => {
     setMessage(propMessage);
   }, [propMessage]);
 
-  useEffect(() => {
-    if (message?.replyToMessageID) {
-      DataStore.query(MessageModel, message.replyToMessageID).then(setRepliedTo);
-    }
-  }, [message]);
-
-  useEffect(() => {
-    const subscription = DataStore.observe(MessageModel, message.id).subscribe(
-      (msg) => {
-        if (msg.model === MessageModel && msg.opType === "UPDATE") {
-          setMessage((message) => ({ ...message, ...msg.element }));
-        }
-      }
-    );
-
-    return () => subscription.unsubscribe();
-  }, []);
-
-  useEffect(() => {
-    setAsRead();
-  }, [isMe, message]);
 
   useEffect(() => {
     if (message.audio) {
@@ -78,30 +56,19 @@ const Messages = (props: any) => {
     checkIfMe();
   }, [user]);
 
-  const setAsRead = async () => {
-    if (isMe === false && message.status !== "READ") {
-      await DataStore.save(
-        MessageModel.copyOf(message, (updated) => {
-          updated.status = "READ";
-        })
-      );
-    }
-  };
 
   if (!user) {
     return <ActivityIndicator />;
   }
 
   return (
-    <Pressable
-      onLongPress={setAsMessageReply}
+    <View
       style={[
         styles.container,
         isMe ? styles.rightContainer : styles.leftContainer,
         { width: soundURI ? "75%" : "auto" },
       ]}
     > 
-    {repliedTo && <MessageReply message= {repliedTo}/>}
       {message.image && (
         <View style={{ marginBottom: message.content ? 10 : 0 }}>
           <S3Image
@@ -129,10 +96,10 @@ const Messages = (props: any) => {
           />
         )}
       </View>
-    </Pressable>
+    </View>
   );
 };
 
 
 
-export default Messages;
+export default MessageReply;

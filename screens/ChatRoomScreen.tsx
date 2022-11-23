@@ -12,6 +12,7 @@ const ChatRoomScreen = () => {
     const navigation = useNavigation()
 
     const [message, setMessage] = useState<Message[]>([])
+    const [messageReplyTo,setMessageReplyTo]=useState<Message|null>(null)
     const [chatRoom, setChatRoom] = useState<ChatRoom | null>(null)
 
     useEffect(() => {
@@ -67,10 +68,10 @@ const ChatRoomScreen = () => {
         <SafeAreaView style={styles.page}>
             <FlatList
                 data={message}
-                renderItem={({ item }) => <Messages message={item} />}
+                renderItem={({ item }) => <Messages message={item} setAsMessageReply={()=>setMessageReplyTo(item)}/>}
                 inverted
             />
-            <MessageInput chatroom={chatRoom} />
+            <MessageInput chatroom={chatRoom} messageReplyTo={messageReplyTo} removeMessageReplyTo={()=>setMessageReplyTo(null)}/>
         </SafeAreaView>
     )
 }

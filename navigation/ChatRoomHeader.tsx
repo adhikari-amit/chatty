@@ -31,7 +31,7 @@ const ChatRoomHeader = (id: any) => {
        return "online"
     }
     else{
-        return `Last Seen ${moment(user.lastOnlineAt).fromNow()}`
+        return `last Seen ${moment(user.lastOnlineAt).fromNow()}`
     }
    }
     return (

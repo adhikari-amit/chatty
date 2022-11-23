@@ -18,9 +18,10 @@ import 'react-native-get-random-values'
 import { v4 as uuidv4 } from 'uuid'
 import { Audio, AVPlaybackStatus } from 'expo-av'
 import AudioPlayer from '../AudioPlayer'
+import Messages from '../Messages'
 
 
-const MessageInput = ({ chatroom }: any) => {
+const MessageInput = ({ chatroom , messageReplyTo,removeMessageReplyTo}: any) => {
     const [message, setMessage] = useState('')
     const [isEmojiPickerOpen, setIsEmojiPickerOpen] = useState(false)
     const [image, setImage] = useState<string | null>(null)
@@ -35,6 +36,7 @@ const MessageInput = ({ chatroom }: any) => {
         setImage(null)
         setProgress(0)
         setSoundURI( null)
+        removeMessageReplyTo()
       
     }
 
@@ -96,7 +98,8 @@ const MessageInput = ({ chatroom }: any) => {
                 content: message,
                 userID: user.attributes.sub,
                 chatroomID: chatroom.id,
-                status:"SENT"
+                status:"SENT",
+                replyToMessageID:messageReplyTo?.id
             }))
             UpdateLastMessage(newMessage)
             resetFields()
@@ -124,6 +127,8 @@ const MessageInput = ({ chatroom }: any) => {
             image: key,
             userID: user.attributes.sub,
             chatroomID: chatroom.id,
+            replyToMessageID:messageReplyTo?.id
+
         }))
         UpdateLastMessage(newMessage)
         resetFields()
@@ -217,6 +222,8 @@ const MessageInput = ({ chatroom }: any) => {
             audio: key,
             userID: user.attributes.sub,
             chatroomID: chatroom.id,
+            replyToMessageID:messageReplyTo?.id
+
         }))
         UpdateLastMessage(newMessage)
         resetFields()
@@ -229,6 +236,18 @@ const MessageInput = ({ chatroom }: any) => {
         <KeyboardAvoidingView style={[styles.root, { height: isEmojiPickerOpen ? "50%" : "auto" }]} behavior={Platform.OS === 'ios' ? 'padding' : "height"}
             keyboardVerticalOffset={80}
         >
+            {messageReplyTo && 
+               <View style={{backgroundColor:"#f2f2f2",padding:5,flexDirection:"row", alignItems:"stretch",justifyContent:"space-between"}}>
+                <View style={{flex:1}}>
+                   <Text>Reply To</Text>
+                   <Messages message={messageReplyTo}></Messages>
+                </View>
+                <Pressable onPress={() => removeMessageReplyTo()}>
+                    <AntDesign name="close" size={24} color="black" style={{ margin: 5 }} />
+                </Pressable>
+
+               </View>
+            }
             {image && (<View style={styles.sendImageContainer}>
                 <Image source={{ uri: image }} style={{ width: 100, height: 100, borderRadius: 10 }} />
 
