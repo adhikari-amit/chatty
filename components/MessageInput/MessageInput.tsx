@@ -19,6 +19,7 @@ import { v4 as uuidv4 } from 'uuid'
 import { Audio, AVPlaybackStatus } from 'expo-av'
 import AudioPlayer from '../AudioPlayer'
 import Messages from '../Messages'
+import MessageReply from '../MessageReply'
 
 
 const MessageInput = ({ chatroom , messageReplyTo,removeMessageReplyTo}: any) => {
@@ -240,7 +241,7 @@ const MessageInput = ({ chatroom , messageReplyTo,removeMessageReplyTo}: any) =>
                <View style={{backgroundColor:"#f2f2f2",padding:5,flexDirection:"row", alignItems:"stretch",justifyContent:"space-between"}}>
                 <View style={{flex:1}}>
                    <Text>Reply To</Text>
-                   <Messages message={messageReplyTo}></Messages>
+                   <MessageReply message={messageReplyTo} />
                 </View>
                 <Pressable onPress={() => removeMessageReplyTo()}>
                     <AntDesign name="close" size={24} color="black" style={{ margin: 5 }} />

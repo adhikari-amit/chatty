@@ -17,13 +17,10 @@ import { Message as MessageModel } from "../../src/models";
 import styles from "./style";
 
 
-
-
 const MessageReply = (props: any) => {
   const { message: propMessage } = props
 
   const [message, setMessage] = useState<MessageModel>(propMessage)
-  const [repliedTo, setRepliedTo] = useState<MessageModel | undefined>(undefined  )
   const [user, setUser] = useState<User | undefined>()
   const [isMe, setIsMe] = useState<boolean | null>(null)
   const [soundURI, setSoundURI] = useState<any>(null)
@@ -73,7 +70,7 @@ const MessageReply = (props: any) => {
         <View style={{ marginBottom: message.content ? 10 : 0 }}>
           <S3Image
             imgKey={message.image}
-            style={{ width: width * 0.65, aspectRatio: 4 / 3 }}
+            style={{ width: width * 0.5,height:"auto", aspectRatio: 4 / 3 }}
             resizeMode="contain"
           />
         </View>
@@ -85,16 +82,7 @@ const MessageReply = (props: any) => {
             {message.content}
           </Text>
         )}
-        {isMe && !!message.status && message.status !== "SENT" && (
-          <Ionicons
-            name={
-              message.status === "DELIVERED" ? "checkmark" : "checkmark-done"
-            }
-            size={16}
-            color="gray"
-            style={{ marginHorizontal: 5 }}
-          />
-        )}
+       
       </View>
     </View>
   );

@@ -12,6 +12,7 @@ import LinkingConfiguration from './LinkingConfiguration';
 import { Feather } from '@expo/vector-icons';
 import UsersScreen from '../screens/UsersScreen';
 import ChatRoomHeader from './ChatRoomHeader';
+import HomeHeader from './HomeHeader';
 
 
 export default function Navigation({ colorScheme }: { colorScheme: ColorSchemeName }) {
@@ -59,29 +60,6 @@ function RootNavigator() {
 }
 
 
-const HomeHeader=()=>{
-  const {width}=useWindowDimensions()
-    const navigation= useNavigation()
-    const Pressed=()=>{
-      navigation.navigate('UsersScreen')
-    }
-  return (
-    <View style={{
-      flexDirection:'row',
-      justifyContent:'space-between',
-      width:width-15,
-      padding:10,
-      alignItems:'center'
-    }}>
-     <Image source={{uri:'https://notjustdev-dummy.s3.us-east-2.amazonaws.com/avatars/3.jpg'}} style={{width:30,height:30,borderRadius:30}}/>
-      <Text style={{flex:1,textAlign:'center', marginLeft:50,fontWeight:'bold'}}>Chatty</Text>     
-        <Feather name="camera" size={24} color="black"  style={{marginHorizontal:10}}/>
-        <Pressable onPress={Pressed}>
-          <Feather name="edit-2" size={24} color="black" style={{marginHorizontal:10}}/>
-        </Pressable> 
-    </View>
-  )
-}
 
 
 

@@ -1,21 +1,19 @@
-import React, {useState, useEffect} from 'react'
+import React, { useState, useEffect } from 'react'
 import { Text, Image, View, Pressable, ActivityIndicator } from 'react-native'
 import { useNavigation } from '@react-navigation/core'
 import { DataStore } from '@aws-amplify/datastore'
 import { ChatRoomUser, User, Message } from '../../src/models'
 import styles from './style'
-import {Auth} from '@aws-amplify/auth'
+import { Auth } from '@aws-amplify/auth'
 import moment from 'moment'
 
-export default function ChatRoomItem({ chatRoom }:any) {
+export default function ChatRoomItem({ chatRoom }: any) {
 
-  // all users in this chatroom
-  // const [users, setUsers] = useState<User[]>([]); 
-  const [user, setUser] = useState<User|null>(null); 
-  const [lastMessage, setLastMessage] = useState<Message|undefined>();
-
+  const [user, setUser] = useState<User | null>(null);
+  const [lastMessage, setLastMessage] = useState<Message | undefined>();
+  const [isLoading,setIsLoading]=useState(true)
   const navigation = useNavigation();
-  
+
   useEffect(() => {
     const fetchUsers = async () => {
       const fetchedUsers = (await DataStore.query(ChatRoomUser))
@@ -23,10 +21,12 @@ export default function ChatRoomItem({ chatRoom }:any) {
         .map(chatRoomUser => chatRoomUser.user)
       const authUser = await Auth.currentAuthenticatedUser();
       setUser(fetchedUsers.find(user => user.id !== authUser.attributes.sub) || null)
+      setIsLoading(false)
     };
     fetchUsers();
   }, []);
 
+  
   useEffect(() => {
     if (!chatRoom.chatRoomLastMessageId) { return }
     DataStore.query(Message, chatRoom.chatRoomLastMessageId).then(setLastMessage);
@@ -36,13 +36,13 @@ export default function ChatRoomItem({ chatRoom }:any) {
     navigation.navigate('ChatRoom', { id: chatRoom.id });
   }
 
-  if (!user) {
+  if (isLoading) {
     return <ActivityIndicator />
   }
-  const lastmessagecreateat=moment(lastMessage?.createdAt).from(moment())
+  const lastmessagecreateat = moment(lastMessage?.createdAt).from(moment())
   return (
     <Pressable onPress={onPress} style={styles.container}>
-      <Image source={{ uri: user.imageUri}} style={styles.image} />
+      <Image source={{ uri: user.imageUri }} style={styles.image} />
 
       {!!chatRoom.newMessages && <View style={styles.badgeContainer}>
         <Text style={styles.badgeText}>{chatRoom.newMessages}</Text>
