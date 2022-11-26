@@ -1,60 +1,55 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Text, Image, View, Pressable } from 'react-native';
 import { useNavigation } from '@react-navigation/core';
 import styles from './style';
 import { Auth, DataStore } from 'aws-amplify';
 import { ChatRoom, User, ChatRoomUser } from '../../src/models';
 
-export default function UserItem({ user }:any) {
-  const navigation = useNavigation()
-
-  //  TODO 
-  //  const [chatroom, setChatroom] = useState()
-  //  useEffect(()=>{
-  //    const getchatroom=async()=>{
-  //     // const fetchedchatroom = (await DataStore.query(ChatRoomUser)).filter(chatRoomUser => chatRoomUser.user.id === user.id)
-  //     //   // setChatroom(fetchedchatroom)
-  //       const authUser = await Auth.currentAuthenticatedUser()
-  //       const userinchatroom=(await DataStore.query(ChatRoomUser)).filter(chatRoomUser => chatRoomUser.user.id === authUser.attributes.sub)
-        
-  //       const fetchedchatroom = (await DataStore.query(ChatRoomUser, (chatroom) =>chatroom.id('contains', userinchatroom),)).filter(chatRoomUser => chatRoomUser.user.id === user.id)
-  //    }
-  //    getchatroom()
-  //  },[])
-
+export default function UserItem( props:any) {
+  const navigation = useNavigation();
 
   const onPress = async () => {
 
-    // TODO if there is already a chat room between these 2 users
-    // then redirect to the existing chat room
-    // otherwise, create a new chatroom with these users.
-    // Create a chat room
+    const authUser = await Auth.currentAuthenticatedUser();
+    const dbUser = await DataStore.query(User, authUser.attributes.sub);
+    const authUserChatRooms= (await DataStore.query(ChatRoomUser)).filter(chatRoomUser => chatRoomUser.user.id === dbUser?.id).map(chatRoomUser => chatRoomUser.chatRoom);
+    const propsUserChatRooms=(await DataStore.query(ChatRoomUser)).filter((ChatRoomUser)=>ChatRoomUser.user.id===props.user.id).map(chatRoomUser => chatRoomUser.chatRoom)
+
+    const commonChatRoom=authUserChatRooms.filter((chatroom)=>{
+      return propsUserChatRooms.find((propchatroom)=>propchatroom.id===chatroom.id)
+    })
+    if(commonChatRoom.length===0){
+    //  Create a chat room
     const newChatRoom = await DataStore.save(new ChatRoom({newMessages: 0}));
     
     // connect authenticated user with the chat room
-    const authUser = await Auth.currentAuthenticatedUser();
-    const dbUser = await DataStore.query(User, authUser.attributes.sub);
     await DataStore.save(new ChatRoomUser({
-      user: dbUser,
-      chatroom: newChatRoom
+      user:dbUser,
+      chatRoom: newChatRoom
     }))
 
     // connect clicked user with the chat room
     await DataStore.save(new ChatRoomUser({
-      user: user,
-      chatroom: newChatRoom
-    }))
+      user:props.user,
+      chatRoom: newChatRoom
+    }));
 
     navigation.navigate('ChatRoom', { id: newChatRoom.id });
+      
+    }
+    else{
+      navigation.navigate('ChatRoom', { id: commonChatRoom[0].id });
+    }
+    
   }
 
   return (
     <Pressable onPress={onPress} style={styles.container}>
-      <Image source={{ uri: user.imageUri}} style={styles.image} />
-
+      <Image source={{ uri:props.user.imageUri}} style={styles.image} />
       <View style={styles.rightContainer}>
         <View style={styles.row}>
-          <Text style={styles.name}>{user.name}</Text>
+          <Text style={styles.name}>{props.user.name}</Text>
+          <Text style={styles.status}>{props.user.status}</Text>
         </View>
       </View>
     </Pressable>

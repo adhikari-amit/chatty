@@ -13,7 +13,13 @@ import Navigation from "./navigation";
 import moment from "moment";
 import { ActionSheetProvider } from '@expo/react-native-action-sheet';
 
-Amplify.configure(config);
+
+Amplify.configure({
+  ...config,
+  Analytics: { 
+    disabled: true
+  }
+});
 
 function App() {
   const isLoadingComplete = useCachedResources();

@@ -1,6 +1,7 @@
 import { useNavigation } from "@react-navigation/native"
 import { useWindowDimensions, View,Text,Pressable,Image } from "react-native"
 import { Feather } from '@expo/vector-icons';
+import { MaterialIcons } from '@expo/vector-icons'; 
 import { useEffect, useState } from "react";
 import { Auth, DataStore } from "aws-amplify";
 import { User } from "../src/models";
@@ -25,7 +26,10 @@ const HomeHeader=()=>{
    },[])
    
  
-
+   const logOut = () => {
+    Auth.signOut();
+  }
+  
       
     return (
       <View style={{
@@ -36,11 +40,13 @@ const HomeHeader=()=>{
         alignItems:'center'
       }}>
        <Image source={{uri:user?.imageUri}} style={{width:30,height:30,borderRadius:30}}/>
-        <Text style={{flex:1,textAlign:'center', marginLeft:50,fontWeight:'bold'}}>Chatty</Text>     
-          <Feather name="camera" size={24} color="black"  style={{marginHorizontal:10}}/>
+        <Text style={{flex:1,textAlign:'center', marginLeft:50,fontWeight:'bold',fontSize:15}}>Chatty</Text>     
           <Pressable onPress={Pressed}>
             <Feather name="edit-2" size={24} color="black" style={{marginHorizontal:10}}/>
           </Pressable> 
+          <Pressable onPress={logOut} >
+            <MaterialIcons name="logout" size={24} color="black" style={{marginHorizontal:10}}/>
+          </Pressable>
       </View>
     )
   }

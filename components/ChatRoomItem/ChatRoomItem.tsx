@@ -7,6 +7,7 @@ import styles from './style'
 import { Auth } from '@aws-amplify/auth'
 import moment from 'moment'
 
+
 export default function ChatRoomItem({ chatRoom }: any) {
 
   const [user, setUser] = useState<User | null>(null);
@@ -42,7 +43,7 @@ export default function ChatRoomItem({ chatRoom }: any) {
   const lastmessagecreateat = moment(lastMessage?.createdAt).from(moment())
   return (
     <Pressable onPress={onPress} style={styles.container}>
-      <Image source={{ uri: user.imageUri }} style={styles.image} />
+      <Image source={{ uri: user?.imageUri }} style={styles.image} />
 
       {!!chatRoom.newMessages && <View style={styles.badgeContainer}>
         <Text style={styles.badgeText}>{chatRoom.newMessages}</Text>
@@ -50,7 +51,7 @@ export default function ChatRoomItem({ chatRoom }: any) {
 
       <View style={styles.rightContainer}>
         <View style={styles.row}>
-          <Text style={styles.name}>{user.name}</Text>
+          <Text numberOfLines={1} style={styles.name}>{user?.name}</Text>
           <Text style={styles.text}>{lastmessagecreateat}</Text>
         </View>
         <Text numberOfLines={1} style={styles.text}>{lastMessage?.content}</Text>
