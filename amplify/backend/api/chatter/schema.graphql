@@ -20,6 +20,7 @@ type User @model @auth(rules: [{allow: public}]) {
   Messages: [Message] @hasMany(indexName: "byUser", fields: ["id"])
   chatrooms: [ChatRoom] @manyToMany(relationName: "ChatRoomUser")
   lastOnlineAt: AWSTimestamp
+  publicKey: String
 }
 
 type Message @model @auth(rules: [{allow: public}]) {
@@ -31,5 +32,6 @@ type Message @model @auth(rules: [{allow: public}]) {
   audio: String
   status: MessageStatus
   replyToMessageID: ID
+  forUserID: ID
 }
  

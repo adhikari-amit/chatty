@@ -4,7 +4,7 @@ import Messages from '../components/Messages';
 import MessageInput from '../components/MessageInput';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { ChatRoom, Message } from '../src/models';
-import { DataStore, SortDirection } from 'aws-amplify';
+import { Auth, DataStore, SortDirection } from 'aws-amplify';
 
 
 const ChatRoomScreen = () => {
@@ -36,21 +36,29 @@ const ChatRoomScreen = () => {
   
     useEffect(() => {
         const fetchMessages = async () => {
+            const authUser=await Auth.currentAuthenticatedUser()
+            const myID=authUser.attributes.sub
             if (!chatRoom) {
                 return
             }
-            const fetchedmessage = await DataStore.query(Message, message => message.chatroomID("eq", chatRoom?.id), { sort: message => message.createdAt(SortDirection.DESCENDING) })
-
+            const fetchedmessage = await DataStore.query(Message, message => message.chatroomID("eq", chatRoom?.id).forUserID("eq",myID), { sort: message => message.createdAt(SortDirection.DESCENDING) })
+        
+            
             setMessage(fetchedmessage)
         }
         fetchMessages()
+        
     }, [chatRoom])
 
     useEffect(() => {
-
+     
         const subscription = DataStore.observe(Message).subscribe(msg => {
+            if (!route.params?.id) {
+                console.warn("No ChatRoom Id Provided")
+                return
+            }
+            if (msg.model === Message && msg.opType === "INSERT" && msg.element.chatroomID===route.params.id) {
 
-            if (msg.model === Message && msg.opType === "INSERT") {
                 setMessage(existingMessage => [msg.element, ...existingMessage])
             }
         })

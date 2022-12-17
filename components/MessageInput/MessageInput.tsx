@@ -6,12 +6,13 @@ import {
     Pressable,
     Image,
     KeyboardAvoidingView,
-    Platform
+    Platform,
+    Alert
 } from 'react-native'
 import styles from './style'
 import { SimpleLineIcons, Feather, AntDesign, Ionicons } from '@expo/vector-icons'
 import { Auth, DataStore, Storage } from 'aws-amplify'
-import { ChatRoom, Message } from '../../src/models'
+import { ChatRoom, ChatRoomUser, EagerUser, Message } from '../../src/models'
 import EmojiSelector, { Categories } from "react-native-emoji-selector"
 import * as ImagePicker from 'expo-image-picker'
 import 'react-native-get-random-values'
@@ -20,25 +21,31 @@ import { Audio, AVPlaybackStatus } from 'expo-av'
 import AudioPlayer from '../AudioPlayer'
 import Messages from '../Messages'
 import MessageReply from '../MessageReply'
+import { useNavigation } from '@react-navigation/native'
 
 
-const MessageInput = ({ chatroom , messageReplyTo,removeMessageReplyTo}: any) => {
+import { box } from "tweetnacl";
+import { encrypt, stringToUint8Array } from '../../utils/crypto'
+import AsyncStorage from "@react-native-async-storage/async-storage";
+export const PRIVATE_KEY = "PRIVATE_KEY";
+
+const MessageInput = ({ chatroom, messageReplyTo, removeMessageReplyTo }: any) => {
     const [message, setMessage] = useState('')
     const [isEmojiPickerOpen, setIsEmojiPickerOpen] = useState(false)
     const [image, setImage] = useState<string | null>(null)
     const [recording, setRecording] = useState<Audio.Recording | null>(null)
     const [soundURI, setSoundURI] = useState<string | null>(null)
     const [progress, setProgress] = useState(0)
-   
+
     //  Reset StateValue of all once data send.
     const resetFields = () => {
         setMessage('')
         setIsEmojiPickerOpen(false)
         setImage(null)
         setProgress(0)
-        setSoundURI( null)
+        setSoundURI(null)
         removeMessageReplyTo()
-      
+
     }
 
     // Permission ask fro audio,camera,image
@@ -50,7 +57,7 @@ const MessageInput = ({ chatroom , messageReplyTo,removeMessageReplyTo}: any) =>
                 const audioResponse = await Audio.requestPermissionsAsync()
                 if (
                     libraryResponse.status !== "granted" ||
-                    photoResponse.status !== "granted"
+                    photoResponse.status !== "granted" 
                 ) {
                     alert("Sorry, we need camera roll permissions to make this work!")
                 }
@@ -60,22 +67,22 @@ const MessageInput = ({ chatroom , messageReplyTo,removeMessageReplyTo}: any) =>
     }, [])
 
     // Send the content on press button click.  
-    const sendContent =async () => {
+    const sendContent = async () => {
         if (image) {
             sendImage()
         }
-        else if(soundURI){
+        else if (soundURI) {
             sendAudio()
-        } 
+        }
         else if (message) {
             sendMessage()
         }
         else {
             onePlusCLicked()
         }
-        
-        const authUser=await Auth.currentAuthenticatedUser()
-        
+
+        const authUser = await Auth.currentAuthenticatedUser()
+
     }
 
     // Update the Last Message.
@@ -90,24 +97,67 @@ const MessageInput = ({ chatroom , messageReplyTo,removeMessageReplyTo}: any) =>
         console.log("clicked")
     }
 
-    // Function for sending the text Message
-    const sendMessage = async () => {
-        const user = await Auth.currentAuthenticatedUser()
+    const navigation = useNavigation()
 
+    const getMySecretKey = async () => {
+        const keyString = await AsyncStorage.getItem(PRIVATE_KEY);
+
+        if (!keyString) {
+            Alert.alert(
+                "You haven't set your keypair yet",
+                "Go to settings, and generate a new keypair",
+                [
+                    {
+                        text: "Open setting",
+                        onPress: () => navigation.navigate("Settings"),
+                    },
+                ]
+            );
+            return;
+        }
+        // return stringToUint8Array(keyString);
+        return Uint8Array.from(keyString.split(",").map((str) => parseInt(str)))
+    };
+
+    // Send Encrypted Message to Users
+    const sendMessageToUser = async (user: any, fromUserID: string) => {
+        const mySecretkey = await getMySecretKey()
+
+        if (!mySecretkey) {
+            Alert.alert("You HAVEN'T SET KEYPAIR")
+            return;
+        }
+        if (!user.publicKey) {
+            Alert.alert("OTHER USER HAVEN'T SET KEYPAIR")
+            return;
+        }
+        const sharedkey = box.before(stringToUint8Array(user.publicKey), mySecretkey);
+        const encryptedMessage = encrypt(sharedkey, { message })
         if (message) {
             const newMessage = await DataStore.save(new Message({
-                content: message,
-                userID: user.attributes.sub,
+                content: encryptedMessage,
+                userID: fromUserID,
+                forUserID: user.id,
                 chatroomID: chatroom.id,
-                status:"SENT",
-                replyToMessageID:messageReplyTo?.id
+                status: "SENT",
+                replyToMessageID: messageReplyTo?.id
             }))
-            UpdateLastMessage(newMessage)
-            resetFields()
+
+            // UpdateLastMessage(newMessage)
+        }
+        else {
+            console.warn("No message");
         }
 
     }
 
+    // Function for sending the text Message
+    const sendMessage = async () => {
+        const users = (await DataStore.query(ChatRoomUser)).filter((cru) => cru.chatRoom.id === chatroom.id).map((chatroomuser) => chatroomuser.user)
+        const authUser = await Auth.currentAuthenticatedUser()
+        await Promise.all(users.map(user => sendMessageToUser(user, authUser.attributes.sub)))
+        resetFields()
+    }
 
     // Function for sending the Image
     const sendImage = async () => {
@@ -121,14 +171,15 @@ const MessageInput = ({ chatroom , messageReplyTo,removeMessageReplyTo}: any) =>
             }
         }
         )
-        const user = await Auth.currentAuthenticatedUser()
-
+        const authUser = await Auth.currentAuthenticatedUser()
+     
         const newMessage = await DataStore.save(new Message({
             content: message,
             image: key,
-            userID: user.attributes.sub,
+            userID: authUser.attributes.sub,
             chatroomID: chatroom.id,
-            replyToMessageID:messageReplyTo?.id
+            replyToMessageID: messageReplyTo?.id,
+            forUserID:authUser.attributes.sub
 
         }))
         UpdateLastMessage(newMessage)
@@ -138,7 +189,7 @@ const MessageInput = ({ chatroom , messageReplyTo,removeMessageReplyTo}: any) =>
 
     // Image processing before sending the image/audio
     const getBlob = async (uri: string) => {
-       
+
         const response = await fetch(uri)
         const blob = await response.blob()
         return blob
@@ -171,7 +222,7 @@ const MessageInput = ({ chatroom , messageReplyTo,removeMessageReplyTo}: any) =>
         }
 
     }
-    
+
 
     const startRecording = async () => {
         try {
@@ -193,7 +244,7 @@ const MessageInput = ({ chatroom , messageReplyTo,removeMessageReplyTo}: any) =>
             return
         }
         setRecording(null)
-        
+
         await recording.stopAndUnloadAsync()
 
         await Audio.setAudioModeAsync({
@@ -213,8 +264,8 @@ const MessageInput = ({ chatroom , messageReplyTo,removeMessageReplyTo}: any) =>
             return
         }
         const blob = await getBlob(soundURI)
-        const uriParts=soundURI.split(".")
-        const extension=uriParts[uriParts.length-1]
+        const uriParts = soundURI.split(".")
+        const extension = uriParts[uriParts.length - 1]
         const { key } = await Storage.put(`${uuidv4()}.${extension}`, blob)
         const user = await Auth.currentAuthenticatedUser()
 
@@ -223,7 +274,8 @@ const MessageInput = ({ chatroom , messageReplyTo,removeMessageReplyTo}: any) =>
             audio: key,
             userID: user.attributes.sub,
             chatroomID: chatroom.id,
-            replyToMessageID:messageReplyTo?.id
+            replyToMessageID: messageReplyTo?.id,
+            forUserID: null,
 
         }))
         UpdateLastMessage(newMessage)
@@ -237,17 +289,17 @@ const MessageInput = ({ chatroom , messageReplyTo,removeMessageReplyTo}: any) =>
         <KeyboardAvoidingView style={[styles.root, { height: isEmojiPickerOpen ? "50%" : "auto" }]} behavior={Platform.OS === 'ios' ? 'padding' : "height"}
             keyboardVerticalOffset={80}
         >
-            {messageReplyTo && 
-               <View style={{backgroundColor:"#f2f2f2",padding:5,flexDirection:"row", alignItems:"stretch",justifyContent:"space-between"}}>
-                <View style={{flex:1}}>
-                   <Text>Reply To</Text>
-                   <MessageReply message={messageReplyTo} />
-                </View>
-                <Pressable onPress={() => removeMessageReplyTo()}>
-                    <AntDesign name="close" size={24} color="black" style={{ margin: 5 }} />
-                </Pressable>
+            {messageReplyTo &&
+                <View style={{ backgroundColor: "#f2f2f2", padding: 5, flexDirection: "row", alignItems: "stretch", justifyContent: "space-between" }}>
+                    <View style={{ flex: 1 }}>
+                        <Text>Reply To</Text>
+                        <MessageReply message={messageReplyTo} />
+                    </View>
+                    <Pressable onPress={() => removeMessageReplyTo()}>
+                        <AntDesign name="close" size={24} color="black" style={{ margin: 5 }} />
+                    </Pressable>
 
-               </View>
+                </View>
             }
             {image && (<View style={styles.sendImageContainer}>
                 <Image source={{ uri: image }} style={{ width: 100, height: 100, borderRadius: 10 }} />
@@ -268,7 +320,7 @@ const MessageInput = ({ chatroom , messageReplyTo,removeMessageReplyTo}: any) =>
             </View>)
             }
 
-            {soundURI && <AudioPlayer soundURI={soundURI}/>
+            {soundURI && <AudioPlayer soundURI={soundURI} />
             }
 
             <View style={styles.row}>

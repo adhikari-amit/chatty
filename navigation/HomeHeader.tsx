@@ -13,6 +13,9 @@ const HomeHeader=()=>{
       const Pressed=()=>{
         navigation.navigate('UsersScreen')
       }
+      const SettingPressed=()=>{
+        navigation.navigate('Settings')
+      }
 
   
    useEffect(()=>{
@@ -40,13 +43,13 @@ const HomeHeader=()=>{
         alignItems:'center'
       }}>
        <Image source={{uri:user?.imageUri}} style={{width:30,height:30,borderRadius:30}}/>
-        <Text style={{flex:1,textAlign:'center', marginLeft:50,fontWeight:'bold',fontSize:15}}>Chatty</Text>     
+        <Text style={{flex:1,textAlign:'center', marginLeft:50,fontWeight:'bold',fontSize:15}}>Chatty</Text>
+          <Pressable onPress={SettingPressed}>
+            <Feather name="settings" size={24} color="black" style={{marginHorizontal:10}}/>
+          </Pressable>
           <Pressable onPress={Pressed}>
             <Feather name="edit-2" size={24} color="black" style={{marginHorizontal:10}}/>
           </Pressable> 
-          <Pressable onPress={logOut} >
-            <MaterialIcons name="logout" size={24} color="black" style={{marginHorizontal:10}}/>
-          </Pressable>
       </View>
     )
   }

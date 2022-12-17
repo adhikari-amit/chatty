@@ -54,7 +54,7 @@ export default function ChatRoomItem({ chatRoom }: any) {
           <Text numberOfLines={1} style={styles.name}>{user?.name}</Text>
           <Text style={styles.text}>{lastmessagecreateat}</Text>
         </View>
-        <Text numberOfLines={1} style={styles.text}>{lastMessage?.content}</Text>
+        {/* <Text numberOfLines={1} style={styles.text}>{lastMessage?.content}</Text> */}
       </View>
     </Pressable>
   );

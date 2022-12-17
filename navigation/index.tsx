@@ -13,6 +13,7 @@ import { Feather } from '@expo/vector-icons';
 import UsersScreen from '../screens/UsersScreen';
 import ChatRoomHeader from './ChatRoomHeader';
 import HomeHeader from './HomeHeader';
+import SettingsScreen from '../screens/SettingsScreen';
 
 
 export default function Navigation({ colorScheme }: { colorScheme: ColorSchemeName }) {
@@ -52,6 +53,11 @@ function RootNavigator() {
           name="UsersScreen" 
           component={UsersScreen}         
           options={{title:'Users'}}
+      />
+      <Stack.Screen 
+          name="Settings" 
+          component={SettingsScreen}         
+          options={{title:'Setting'}}
       />
 
       <Stack.Screen name="NotFound" component={NotFoundScreen} options={{ title: 'Oops!' }} />

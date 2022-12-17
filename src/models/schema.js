@@ -169,6 +169,13 @@ export const schema = {
                     "isRequired": false,
                     "attributes": []
                 },
+                "forUserID": {
+                    "name": "forUserID",
+                    "isArray": false,
+                    "type": "ID",
+                    "isRequired": false,
+                    "attributes": []
+                },
                 "createdAt": {
                     "name": "createdAt",
                     "isArray": false,
@@ -292,6 +299,13 @@ export const schema = {
                     "name": "lastOnlineAt",
                     "isArray": false,
                     "type": "AWSTimestamp",
+                    "isRequired": false,
+                    "attributes": []
+                },
+                "publicKey": {
+                    "name": "publicKey",
+                    "isArray": false,
+                    "type": "String",
                     "isRequired": false,
                     "attributes": []
                 },
@@ -430,5 +444,5 @@ export const schema = {
     },
     "nonModels": {},
     "codegenVersion": "3.3.1",
-    "version": "ac1af525ed97357d5230388f691ffc3f"
+    "version": "fc88b2bf7f9d288877f9e912c5fbdeec"
 };
